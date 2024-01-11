@@ -18,6 +18,8 @@ const thrstUpAudio = new Audio("./audio/rocket.mp3");
 const crashAudio = new Audio("./audio/crash.mp3")
 var thrstUpAudio_isPlaying = false;
 var landingRating = 0; // 0 - worst, 5 - best
+var leftTouched = false;
+var rightTouched = false;
 
 
 // Define oval properties
@@ -313,6 +315,7 @@ function drawSpaceship()
 
 function updateSpaceship()
 {
+    // autopilot
    if (spaceship.autoPilot === true) {
     if (spaceship.velocity.x > 0.5) {
         spaceship.translateLeft = true;
@@ -330,6 +333,7 @@ function updateSpaceship()
         spaceship.thrustUpwards = false;
     }
    }
+
     
     spaceship.position.x += spaceship.velocity.x;
     spaceship.position.y += spaceship.velocity.y;
@@ -519,25 +523,25 @@ canvas.addEventListener("mousedown", function(event) {
     }
   });
 
-  canvas.addEventListener("touchstart", function(event) {
-    if (event.touches[0].clientX < canvas.width / 2) {
-      // Left side touched
-      spaceship.rotatingLeft = true;
-    } else if (event.touches[0].clientX > canvas.width / 2) {
-      // Right side touched
-      spaceship.rotatingRight = true;
-    }
-  });
+//   canvas.addEventListener("touchstart", function(event) {
+//     if (event.touches[0].clientX < canvas.width / 2) {
+//       // Left side touched
+//       spaceship.rotatingLeft = true;
+//     } else if (event.touches[0].clientX > canvas.width / 2) {
+//       // Right side touched
+//       spaceship.rotatingRight = true;
+//     }
+//   });
 
-  canvas.addEventListener("touchend", function(event) {
-    if (event.touches[0].clientX < canvas.width / 2) {
-      // Left side touched
-      spaceship.rotatingLeft = false;
-    } else if (event.touches[0].clientX > canvas.width / 2) {
-      // Right side touched
-      spaceship.rotatingRight = falses;
-    }
-  });
+//   canvas.addEventListener("touchend", function(event) {
+//     if (event.touches[0].clientX < canvas.width / 2) {
+//       // Left side touched
+//       spaceship.rotatingLeft = false;
+//     } else if (event.touches[0].clientX > canvas.width / 2) {
+//       // Right side touched
+//       spaceship.rotatingRight = falses;
+//     }
+//   });
   
   
 
@@ -576,5 +580,61 @@ canvas.addEventListener("mousedown", function(event) {
     spaceship.autoPilot = (spaceship.autoPilot === true) ? false : true;
   });
 
+  canvas.addEventListener("touchstart", function(event) {
+    // event.preventDefault();
+    for (let i = 0; i < event.changedTouches.length; i++) {
+      const touch = event.changedTouches[i];
+      if (touch.clientX < canvas.width / 2) {
+        leftTouched = true;
+      } else {
+        rightTouched = true;
+      }
+    }
+  });
+  
+  canvas.addEventListener("touchmove", function(event) {
+    // event.preventDefault();
+    for (let i = 0; i < event.changedTouches.length; i++) {
+      const touch = event.changedTouches[i];
+      if (touch.clientX < canvas.width / 2) {
+        leftTouched = true;
+        rightTouched = false;
+      } else {
+        leftTouched = false;
+        rightTouched = true;
+      }
+    }
+  });
+  
+  canvas.addEventListener("touchend", function(event) {
+    // event.preventDefault();
+    for (let i = 0; i < event.changedTouches.length; i++) {
+      const touch = event.changedTouches[i];
+      if (touch.clientX < canvas.width / 2) {
+        leftTouched = false;
+      } else {
+        rightTouched = false;
+      }
+    }
+  });
+  
+  function doAction() {
+    if (leftTouched && rightTouched) {
+      spaceship.thrustUpwards = true;
+    } else if (leftTouched) {
+      spaceship.rotatingLeft = true;
+      spaceship.rotatingRight = false;
+      spaceship.thrustUpwards = false;
+    } else if (rightTouched) {
+      spaceship.rotatingRight = true;
+      spaceship.rotatingLeft = false;
+      spaceship.thrustUpwards = false;
+    } else {
+      spaceship.rotatingLeft = false;
+      spaceship.rotatingRight = false;
+      spaceship.thrustUpwards = false;
+    }
+    requestAnimationFrame(doAction);
+  }
 
 draw();
