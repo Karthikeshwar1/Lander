@@ -41,6 +41,11 @@ marsSurface.src = "./img/marsSurface.jpg"
 marsSurface.onload = function() {
     context.drawImage(marsSurface, 0, 0, canvasWidth, canvasHeight);
 };
+const earthSurface = new Image();
+earthSurface.src = "./img/earthSurface.jpg"
+earthSurface.onload = function() {
+    context.drawImage(earthSurface, 0, 0, canvasWidth, canvasHeight);
+};
 // LandingSurfaceImages = {
 //     Moon: "./img/moonsurface.jpeg",
 //     Mars: "./img/marsSurface.jpg"
@@ -147,7 +152,7 @@ function drawBackground() {
     context.globalAlpha = (spaceship.position.y/2) * 0.004;
     // Draw the oval shade
     context.beginPath();
-    context.ellipse(spaceship.position.x, ovalY, spaceship.width * 0.7, 20,  0, 0, 2 * Math.PI);
+    context.ellipse(spaceship.position.x, ovalY, spaceship.width * 0.7, 15,  0, 0, 2 * Math.PI);
     context.fillStyle = gradient;
     context.fill();
     context.closePath();
@@ -513,13 +518,18 @@ function keyPressed(event)
             spaceship.autoPilot = (spaceship.autoPilot === true) ? false : true;
             break;
         case 82: // Reset
-            spaceship.position.x = 100;
-            spaceship.position.y = 100;
-            spaceship.velocity.x = 0;
-            spaceship.velocity.y = 0;
-            fuel = 100;
+            resetSimulation();
             break;
     }
+}
+
+function resetSimulation() {
+    spaceship.position.x = 100;
+    spaceship.position.y = 100;
+    spaceship.velocity.x = 0;
+    spaceship.velocity.y = 0;
+    spaceship.angle = 0;
+    fuel = 100;
 }
 
 document.addEventListener('keydown', keyPressed);
@@ -594,7 +604,12 @@ document.addEventListener('keydown', keyPressed);
     }
     else if (landingSurfaceSelected === "Mars") {
         currentLandingSurface = marsSurface;
+    } else if (landingSurfaceSelected === "Earth") {
+        currentLandingSurface = earthSurface; 
+    }else {
+        currentLandingSurface = marsSurface;
     }
+    resetSimulation();
   });
 
   autoPilotToggle.addEventListener("click", () => {
