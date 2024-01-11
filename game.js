@@ -524,25 +524,25 @@ function keyPressed(event)
 
 document.addEventListener('keydown', keyPressed);
 
-canvas.addEventListener("mousedown", function(event) {
-    if (event.button === 0 && event.clientX < canvas.width / 2) {
-      // Left side clicked
-      spaceship.rotatingLeft = true;
-    } else if (event.button === 0 && event.clientX > canvas.width / 2) {
-      // Right side clicked
-      spaceship.rotatingRight = true;
-    }
-  });
+// canvas.addEventListener("mousedown", function(event) {
+//     if (event.button === 0 && event.clientX < canvas.width / 2) {
+//       // Left side clicked
+//       spaceship.rotatingLeft = true;
+//     } else if (event.button === 0 && event.clientX > canvas.width / 2) {
+//       // Right side clicked
+//       spaceship.rotatingRight = true;
+//     }
+//   });
 
-  canvas.addEventListener("mouseup", function(event) {
-    if (event.button === 0 && event.clientX < canvas.width / 2) {
-      // Left side clicked
-      spaceship.rotatingLeft = false;
-    } else if (event.button === 0 && event.clientX > canvas.width / 2) {
-      // Right side clicked
-      spaceship.rotatingRight = false;
-    }
-  });
+//   canvas.addEventListener("mouseup", function(event) {
+//     if (event.button === 0 && event.clientX < canvas.width / 2) {
+//       // Left side clicked
+//       spaceship.rotatingLeft = false;
+//     } else if (event.button === 0 && event.clientX > canvas.width / 2) {
+//       // Right side clicked
+//       spaceship.rotatingRight = false;
+//     }
+//   });
 
 //   canvas.addEventListener("touchstart", function(event) {
 //     if (event.touches[0].clientX < canvas.width / 2) {
