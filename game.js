@@ -162,11 +162,9 @@ function updateStats() {
     context.fillText("vx: "+String((spaceship.velocity.x).toFixed(3))+" vy: "+String((spaceship.velocity.y).toFixed(3)), statsX, statsY+30);
     context.fillText("Fuel: "+String(fuel.toFixed(2)), statsX, statsY+60);
     context.fillText("Autopilot: "+String(spaceship.autoPilot), statsX, statsY+90);
-    if (Math.abs(spaceship.angle) > 2 * Math.PI) {
-        angleDividedBy2Pi = ((spaceship.angle / (2.0 * Math.PI)));
-    }
-     
-    context.fillText("Angle: "+String(angleDividedBy2Pi), statsX, statsY+120);
+ 
+    angleDividedBy2Pi =  ((spaceship.angle * (180 / Math.PI)) % 360);
+    context.fillText("Angle: "+String(angleDividedBy2Pi.toFixed(2)), statsX, statsY+120);
 
 }
 
@@ -317,20 +315,36 @@ function updateSpaceship()
 {
     // autopilot
    if (spaceship.autoPilot === true) {
-    if (spaceship.velocity.x > 0.5) {
+    angleDividedBy2Pi =  ((spaceship.angle * (180 / Math.PI)) % 360);
+    if (spaceship.velocity.x > 0.5) {  // handle motion towards left
         spaceship.translateLeft = true;
     } else {
         spaceship.translateLeft = false;
     }
-    if (spaceship.velocity.x < -0.5) {
+    if (spaceship.velocity.x < -0.5) {  // handle motion towards right
         spaceship.translateRight = true;
     } else {
         spaceship.translateRight = false;
     }
-    if (spaceship.velocity.y > 0.4) {
+    if (spaceship.velocity.y > 0.4) {  // handle motion towards down
         spaceship.thrustUpwards = true;
     } else {
         spaceship.thrustUpwards = false;
+    }
+    if (spaceship.velocity.y < 0) { // handle motion towards up
+        spaceship.thurstDownwards = true;
+    } else {
+        spaceship.thurstDownwards = false;
+    }
+    if (angleDividedBy2Pi > 3) { // handle left rotation
+        spaceship.rotatingLeft = true;
+        spaceship.rotatingRight = false;
+    } else if (angleDividedBy2Pi < -3) { // handle right rotation
+        spaceship.rotatingRight = true;
+        spaceship.rotatingLeft = false;
+    } else  {  // disable autorotation
+        spaceship.rotatingLeft = false;
+        spaceship.rotatingRight = false;
     }
    }
 
@@ -340,17 +354,28 @@ function updateSpaceship()
     
     if (spaceship.rotatingRight) {
         fuel -= 0.005;
-        spaceship.angle += Math.PI / 180;
+        spaceship.angle += 0.7 * Math.PI / 180;
     } else if(spaceship.rotatingLeft) {
         fuel -= 0.005;
-        spaceship.angle -= Math.PI / 180;
+        spaceship.angle -= 0.7 * Math.PI / 180;
     }
     
 
     if (spaceship.thrustUpwards) {
         fuel -= 0.05;
+        if (thrstUpAudio_isPlaying === false) {
+            thrstUpAudio.currentTime = 0;
+            thrstUpAudio.play();
+            thrstUpAudio_isPlaying = true;
+        }
         spaceship.velocity.x -= (spaceship.thrust * Math.sin(-spaceship.angle));
         spaceship.velocity.y -= (spaceship.thrust * Math.cos(spaceship.angle));
+    } else {
+        if (thrstUpAudio_isPlaying === true) {
+            thrstUpAudio.pause();
+            thrstUpAudio.currentTime = 0;
+            thrstUpAudio_isPlaying = false;
+        }
     }
 
     if (spaceship.thurstDownwards && spaceship.grounded === false) {
@@ -442,8 +467,6 @@ function keyReleased(event)
         case 87:
             // Up Arrow key
             spaceship.thrustUpwards = false;
-            thrstUpAudio.pause();
-            thrstUpAudio.currentTime = 0;
             break;
         case 72:
         case 83: // Down Arrow key
@@ -475,8 +498,6 @@ function keyPressed(event)
         case 38:
         case 87: // Up Arrow key
             spaceship.thrustUpwards = true;
-            thrstUpAudio.currentTime = 0;
-            thrstUpAudio.play();
             break;
         case 72:
         case 83: // Down Arrow key
@@ -590,6 +611,7 @@ canvas.addEventListener("mousedown", function(event) {
         rightTouched = true;
       }
     }
+    touchActionTrigger();
   });
   
   canvas.addEventListener("touchmove", function(event) {
@@ -604,6 +626,7 @@ canvas.addEventListener("mousedown", function(event) {
         rightTouched = true;
       }
     }
+    touchActionTrigger();
   });
   
   canvas.addEventListener("touchend", function(event) {
@@ -616,9 +639,10 @@ canvas.addEventListener("mousedown", function(event) {
         rightTouched = false;
       }
     }
+    touchActionTrigger();
   });
   
-  function doAction() {
+  function touchActionTrigger() {
     if (leftTouched && rightTouched) {
       spaceship.thrustUpwards = true;
     } else if (leftTouched) {
@@ -634,7 +658,6 @@ canvas.addEventListener("mousedown", function(event) {
       spaceship.rotatingRight = false;
       spaceship.thrustUpwards = false;
     }
-    requestAnimationFrame(doAction);
   }
 
 draw();
