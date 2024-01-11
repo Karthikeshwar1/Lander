@@ -1,0 +1,30 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Moon Lander</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <div id="wholeScreen">
+    <canvas id="mainScreen" class="subScreen" width="1200" height="700"></canvas>
+    <div id="sideScreen" class="subScreen" width="200" height="500">
+        <form>
+            <p>landingSurface:</p>
+          <input type="radio" id="moon" name="landingSurface" value="Moon">
+          <label for="moon">Moon</label><br>
+          <input type="radio" id="earth" name="landingSurface" value="Earth">
+          <label for="earth">Earth</label><br>
+          <input type="radio" id="mars" name="landingSurface" value="Mars">
+          <label for="mars">Mars</label>
+          
+        
+          </form>
+          <br>
+          <button id="changeLandingSurface">Jump to landingSurface</button>
+          <br>
+          <button id="autoPilotToggle">AutoPilot</button>
+    </div>
+</div>
+    <script src="game.js"></script>
+  </body>
+</html>

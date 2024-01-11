@@ -1,0 +1,4 @@
+#wholeScreen {position: relative;}
+.subScreen {position: absolute;}
+#mainScreen {left: 0;}
+#sideScreen {left: 1230px;}
