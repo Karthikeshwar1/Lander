@@ -1,30 +1,43 @@
 <!doctype html>
 <html>
   <head>
-    <title>Moon Lander</title>
+    <title>Landing Module Simulator</title>
     <link rel="stylesheet" href="style.css">
   </head>
   <body>
     <div id="wholeScreen">
-    <canvas id="mainScreen" class="subScreen" width="1200" height="700"></canvas>
-    <div id="sideScreen" class="subScreen" width="200" height="500">
+      <canvas id="mainScreen" class="subScreen" width="1200" height="700"></canvas>
+      <div id="sideScreen" class="subScreen" width="200" height="500">
         <form>
-            <p>landingSurface:</p>
+          <p>Select landing surface:</p>
           <input type="radio" id="moon" name="landingSurface" value="Moon">
           <label for="moon">Moon</label><br>
           <input type="radio" id="earth" name="landingSurface" value="Earth">
           <label for="earth">Earth</label><br>
           <input type="radio" id="mars" name="landingSurface" value="Mars">
           <label for="mars">Mars</label>
-          
-        
-          </form>
-          <br>
-          <button id="changeLandingSurface">Jump to landingSurface</button>
-          <br>
-          <button id="autoPilotToggle">AutoPilot</button>
+        </form>
+        <br>
+        <br>
+        <div class="dropdown" id="dropdownOptionForVehicle">
+          <select id="vehicleSelect">
+            <option value="Aries">Aries</option>
+            <option value="SpaceX">SpaceX</option>
+          </select>
+        </div>
+        <br>
+        <br>
+        <button class="btn" id="confirmSettingsButton">Jump to the landing Surface</button>
+        <br>
+        <br>
+        <button id="autoPilotToggle">AutoPilot: ON</button>
+        <br>
+        <br>
+        <button id="changeLandingArea">Change Landing Area</button>
+        <br>
+        <br>
+      </div>
     </div>
-</div>
-    <script src="game.js"></script>
+    <script type="module" src="main.js"></script>
   </body>
 </html>
