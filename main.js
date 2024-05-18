@@ -17,6 +17,7 @@ const landingSurfaceOptions = document.querySelectorAll('input[name="landingSurf
 const confirmSettingsButton = document.getElementById("confirmSettingsButton");
 const autoPilotToggleButton = document.getElementById("autoPilotToggle");
 const changeLandingAreaButton = document.getElementById("changeLandingArea");
+const resetSimulationButton = document.getElementById("resetSimulation");
 var changeLandingAreaMode = false;
 
 const thrstUpAudio = new Audio("./audio/rocket.mp3");
@@ -83,9 +84,11 @@ var distLeftHzntl = 0.0;
 var distLeftVtcl = 0.0;
 var timeLeft = 0.0;
 var direction = 0.0;
-var maxAccel = 0.0;
+var maxAccelerationHzntl = 0.0;
+var maxAccelerationVtcl = 0.0;
 var autoPilotCalcDone = false;
-var stoppingDistance = 0.0;
+var stoppingDistanceHzntl = 0.0;
+var stoppingDistanceVtcl = 0.0;
 
 var spaceship =
 {
@@ -125,7 +128,8 @@ var targetLandingArea = {
     position: {
         x: 500,
         y: groundLevel-10
-    }
+    },
+    safeLandingVerticalSpeed: 0.2
 }
 
 
@@ -393,10 +397,11 @@ function doAutoPilotCalc() {
     distLeftHzntl = targetLandingArea.position.x - (spaceship.position.x);
     timeLeft = Math.sqrt(2 * distLeftVtcl / GRAVITY);
     direction = Math.sign(distLeftHzntl);
-    // maxAccel = 2 * (distLeftHzntl - spaceship.velocity.x * timeLeft) / Math.pow(timeLeft, 2);
-    maxAccel = spaceship.thrust * timeLeft;
-    // here, maxAccel * 1 = final velocity [1 is time - it's a bit adjusted]
-    // stoppingDistance = Math.pow(maxAccel, 2) / (2 * spaceship.thrust); 
+    // maxAccelerationHzntl = 2 * (distLeftHzntl - spaceship.velocity.x * timeLeft) / Math.pow(timeLeft, 2);
+    maxAccelerationHzntl = spaceship.thrust * timeLeft;
+    maxAccelerationVtcl = spaceship.thrust * timeLeft;
+    // here, maxAccelerationHzntl * 1 = final velocity [1 is time - it's a bit adjusted]
+    // stoppingDistanceHzntl = Math.pow(maxAccelerationHzntl, 2) / (2 * spaceship.thrust); 
 
     autoPilotCalcDone = true;
 }
@@ -407,27 +412,37 @@ function updateSpaceship()
    if (spaceship.autoPilot) {
     angleDividedBy2Pi =  ((spaceship.angle * (180 / Math.PI)) % 360);
 
-    addStatText("maxAccel"+String(maxAccel.toFixed(2)), statsX, statsY+150);
-    addStatText("stoppingDistance: "+String(stoppingDistance.toFixed(2)), statsX, statsY+180);
+    addStatText("maxAccelerationHzntl"+String(maxAccelerationHzntl.toFixed(2)), statsX, statsY+150);
 
     if (!autoPilotCalcDone) {
         doAutoPilotCalc();
     }
 
-    stoppingDistance = Math.pow(spaceship.velocity.x, 2) / (2 * spaceship.thrust); 
+    stoppingDistanceHzntl = Math.pow(spaceship.velocity.x, 2) / (2 * spaceship.thrust); 
+    stoppingDistanceVtcl = Math.pow(spaceship.velocity.y, 2) / (2 * spaceship.thrust);
 
     distLeftHzntl = targetLandingArea.position.x - (spaceship.position.x);
+    distLeftVtcl = targetLandingArea.position.y - (spaceship.position.y) - 100;
     direction = Math.sign(distLeftHzntl);
 
     addStatText("distLeftHzntl: "+String(distLeftHzntl.toFixed(2)), statsX, statsY+240);
+    addStatText("stoppingDistanceHzntl: "+String(stoppingDistanceHzntl.toFixed(2)), statsX, statsY+270);
+    addStatText("distLeftVtcl: "+String(distLeftVtcl.toFixed(2)), statsX, statsY+300);
+    addStatText("stoppingDistanceVtcl: "+String(stoppingDistanceVtcl.toFixed(2)), statsX, statsY+330);
+
+    if (distLeftVtcl <= stoppingDistanceVtcl && spaceship.velocity.y > targetLandingArea.safeLandingVerticalSpeed) {
+        spaceship.thrustUpwards = true;
+    } else {
+        spaceship.thrustUpwards = false;
+    }
 
     if (direction === 1) {
         if (spaceship.velocity.x >= 0) {
-            if (Math.abs(distLeftHzntl) <= stoppingDistance && Math.abs(distLeftHzntl) > 0) {      
-                spaceship.translateLeft = true;
+            if (Math.abs(distLeftHzntl) <= stoppingDistanceHzntl && Math.abs(distLeftHzntl) > 0) {      
+                spaceship.translateLeft = true; // <--
                 spaceship.translateRight = false;
-            } else if (Math.abs(distLeftHzntl) > stoppingDistance) {
-                spaceship.translateLeft = false;
+            } else if (Math.abs(distLeftHzntl) > stoppingDistanceHzntl) {
+                spaceship.translateLeft = false; // -->
                 spaceship.translateRight = true;
             }
         } else if (spaceship.velocity.x < 0) {
@@ -448,10 +463,10 @@ function updateSpaceship()
             spaceship.translateLeft = true;
             spaceship.translateRight = false;
         } else if (spaceship.velocity.x <= 0) {
-            if (Math.abs(distLeftHzntl) <= stoppingDistance && Math.abs(distLeftHzntl) > 0) {      
+            if (Math.abs(distLeftHzntl) <= stoppingDistanceHzntl && Math.abs(distLeftHzntl) > 0) {      
                 spaceship.translateLeft = false;
                 spaceship.translateRight = true;
-            } else if (Math.abs(distLeftHzntl) > stoppingDistance) {
+            } else if (Math.abs(distLeftHzntl) > stoppingDistanceHzntl) {
                 spaceship.translateLeft = true;
                 spaceship.translateRight = false;
             }
@@ -492,16 +507,16 @@ function updateSpaceship()
     // } else {
     //     spaceship.translateRight = false;
     // }
-    if (spaceship.velocity.y > 0.4) {  // handle motion towards down
-        spaceship.thrustUpwards = true;
-    } else {
-        spaceship.thrustUpwards = false;
-    }
-    if (spaceship.velocity.y < 0) { // handle motion towards up
-        spaceship.thurstDownwards = true;
-    } else {
-        spaceship.thurstDownwards = false;
-    }
+    // if (spaceship.velocity.y > 0.4) {  // handle motion towards down
+    //     spaceship.thrustUpwards = true;
+    // } else {
+    //     spaceship.thrustUpwards = false;
+    // }
+    // if (spaceship.velocity.y < 0) { // handle motion towards up
+    //     spaceship.thurstDownwards = true;
+    // } else {
+    //     spaceship.thurstDownwards = false;
+    // }
     if (angleDividedBy2Pi > 3) { // handle left rotation
         spaceship.rotatingLeft = true;
         spaceship.rotatingRight = false;
@@ -760,6 +775,10 @@ changeLandingAreaButton.addEventListener("click", () => {
     } else {
         changeLandingAreaMode = true;
     }
+});
+
+resetSimulationButton.addEventListener("click", () => {
+    resetSimulation();
 });
 
   canvas.addEventListener("touchstart", function(event) {
