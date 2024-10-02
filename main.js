@@ -11,8 +11,8 @@ const canvasWidth = canvas.width;
 const canvasHeight = canvas.height;
 const groundLevel = canvasHeight - (canvasHeight * 0.07);
 var fuel = 100;
-var statsX = 950;
-var statsY = 50;
+var statsX = 970;
+var statsY = 30;
 
 const landingSurfaceOptions = document.querySelectorAll('input[name="landingSurface"]');
 const confirmSettingsButton = document.getElementById("confirmSettingsButton");
@@ -128,6 +128,8 @@ var spaceship =
     translateRight: false,
     translateLeftManual: false,
     translateRightManual: false,
+    translateLeftLowThrust: false,
+    translateRightLowThrust: false,
     grounded: false,
     autoPilot: true,
     autoPilotlandOnTarget: true,
@@ -238,15 +240,45 @@ function drawBackground() {
 
     context.globalAlpha = 1;
 
+    // Autopilot mode indicator
+    context.fillStyle = '#5b616b'; 
+    context.strokeStyle = '#ffffff'; 
+    context.lineWidth = 2;
+    context.font = '16px Arial';
+    context.textAlign = 'center';
+    context.textBaseline = 'middle';
+
+    context.beginPath();
+    var x = 20;
+    var y = 20;
+    var width = 120;
+    var height = 27;
+    context.moveTo(x + 10, y);
+    context.lineTo(x + width - 10, y);
+    context.quadraticCurveTo(x + width, y, x + width, y + 10);
+    context.lineTo(x + width, y + height - 10);
+    context.quadraticCurveTo(x + width, y + height, x + width - 10, y + height);
+    context.lineTo(x + 10, y + height);
+    context.quadraticCurveTo(x, y + height, x, y + height - 10);
+    context.lineTo(x, y + 10);
+    context.quadraticCurveTo(x, y, x + 10, y);
+    context.closePath();
+    context.fill();
+    context.stroke();
+
+    context.fillStyle = '#ffffff'; 
+    context.fillText("Autopilot: " + String(spaceship.autoPilot ? "ON" : "OFF"), x + width / 2, y + height / 2);
+
+
+
     // Draw heading
-    context.fillStyle = '#5b616b'; // NASA blue
+    context.fillStyle = '#061f4a'; // NASA blue
     context.strokeStyle = '#ffffff'; // White border
     context.lineWidth = 2;
     context.font = '18px Arial';
     context.textAlign = 'center';
     context.textBaseline = 'middle';
 
-    // Draw rounded rectangle
     context.beginPath();
     var x = canvasWidth/2 - 100;
     var y = 20;
@@ -265,18 +297,17 @@ function drawBackground() {
     context.fill();
     context.stroke();
 
-    // Draw text
     context.fillStyle = '#ffffff'; // White text
     context.fillText(String(currPlanet.name) + " (gravity: " + String(currPlanet.gravity_scientific) + " m/s^2)", x + width / 2, y + height / 2);
 
-    context.fillStyle = '#d6d7d9'; // NASA blue
+    // Debug box
+    context.fillStyle = '#d6d7d9'; 
     context.strokeStyle = '#ffffff'; // White border
     context.lineWidth = 2;
     context.font = '18px Arial';
     context.textAlign = 'center';
     context.textBaseline = 'middle';
 
-    // Draw rounded rectangle
     context.beginPath();
     context.globalAlpha = 0.5;
     var x = statsX-10;
