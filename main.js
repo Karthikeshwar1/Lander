@@ -471,6 +471,27 @@ function drawSpaceship()
         context.fillStyle = "white";
         context.fill();
     }
+    if (spaceship.translateRightLowThrust) {
+        context.beginPath();
+        context.globalAlpha = 0.2;
+        context.moveTo(spaceship.width * -0.3, spaceship.height * 0.3);
+        context.lineTo(spaceship.width * -0.3, spaceship.height * -0.3 + 6);
+        context.lineTo(spaceship.width * -0.8 + Math.random() * 5, spaceship.height * -0.5 + 10);
+        context.lineTo(spaceship.width * -0.3, spaceship.height * -0.3);
+        context.closePath();
+        context.fillStyle = "white";
+        context.fill();
+
+        context.beginPath();
+        context.globalAlpha = 0.2;
+        context.moveTo(spaceship.width * -0.3, spaceship.height * 0.2);
+        context.lineTo(spaceship.width * -0.3, spaceship.height * 0.2 + 6);
+        context.lineTo(spaceship.width * -0.8 + Math.random() * 5, spaceship.height * 0.2 +3);
+        context.lineTo(spaceship.width * -0.3, spaceship.height * 0.2);
+        context.closePath();
+        context.fillStyle = "white";
+        context.fill();
+    }
     if (spaceship.translateLeft) {
         context.beginPath();
         context.globalAlpha = 0.5;
@@ -484,6 +505,27 @@ function drawSpaceship()
 
         context.beginPath();
         context.globalAlpha = 0.5;
+        context.moveTo(spaceship.width * 0.3, spaceship.height * 0.2);
+        context.lineTo(spaceship.width * 0.3, spaceship.height * 0.2 + 6);
+        context.lineTo(spaceship.width * 0.8 + Math.random() * 5, spaceship.height * 0.2 +3);
+        context.lineTo(spaceship.width * 0.3, spaceship.height * 0.2);
+        context.closePath();
+        context.fillStyle = "white";
+        context.fill();
+    }
+    if (spaceship.translateLeftLowThrust) {
+        context.beginPath();
+        context.globalAlpha = 0.2;
+        context.moveTo(spaceship.width * 0.3, spaceship.height * 0.3);
+        context.lineTo(spaceship.width * 0.3, spaceship.height * -0.3 + 6);
+        context.lineTo(spaceship.width * 0.8 + Math.random() * 5, spaceship.height * -0.5 + 10);
+        context.lineTo(spaceship.width * 0.3, spaceship.height * -0.3);
+        context.closePath();
+        context.fillStyle = "white";
+        context.fill();
+
+        context.beginPath();
+        context.globalAlpha = 0.2;
         context.moveTo(spaceship.width * 0.3, spaceship.height * 0.2);
         context.lineTo(spaceship.width * 0.3, spaceship.height * 0.2 + 6);
         context.lineTo(spaceship.width * 0.8 + Math.random() * 5, spaceship.height * 0.2 +3);
@@ -544,44 +586,78 @@ function updateSpaceship()
 
     if (direction === 1) {
         if (spaceship.velocity.x >= 0) {
-            if (Math.abs(distLeftHzntl) <= stoppingDistanceHzntl && Math.abs(distLeftHzntl) > 0) {      
-                spaceship.translateLeft = true; // <--
-                spaceship.translateRight = false;
+            if (Math.abs(distLeftHzntl) <= stoppingDistanceHzntl && Math.abs(distLeftHzntl) > 0) {
+                if (Math.abs(distLeftHzntl) <= 20) {
+                    spaceship.translateLeftLowThrust = true;
+                    spaceship.translateRightLowThrust = false;
+                } else {
+                    spaceship.translateLeft = true; // <--
+                    spaceship.translateRight = false;
+                }
             } else if (Math.abs(distLeftHzntl) > stoppingDistanceHzntl) {
+                if (Math.abs(distLeftHzntl) <= 20) {
+                    spaceship.translateLeftLowThrust = false;
+                    spaceship.translateRightLowThrust = true;
+                } else {
+                    spaceship.translateLeft = false; // -->
+                    spaceship.translateRight = true;
+                }
+            }
+        } else if (spaceship.velocity.x < 0) {
+            if (Math.abs(distLeftHzntl) <= 20) {
+                spaceship.translateLeftLowThrust = false;
+                spaceship.translateRightLowThrust = true;
+            } else {
                 spaceship.translateLeft = false; // -->
                 spaceship.translateRight = true;
             }
-        } else if (spaceship.velocity.x < 0) {
-            spaceship.translateLeft = false;
-            spaceship.translateRight = true;
         }
 
 
         if (Math.abs(distLeftHzntl) < 0+rndoff && Math.abs(distLeftHzntl) > 0-rndoff) {
             addStatText("Aligned towards target", statsX, statsY+150);
-            spaceship.translateLeft = false;
-            spaceship.translateRight = false;
+                spaceship.translateLeftLowThrust = false;
+                spaceship.translateRightLowThrust = false;
+                spaceship.translateLeft = false; 
+                spaceship.translateRight = false;
         }
     }
      else if (direction === -1) {
         addStatText("Opposite direction", statsX, statsY+165);
         if (spaceship.velocity.x > 0) {
-            spaceship.translateLeft = true;
-            spaceship.translateRight = false;
+            if (Math.abs(distLeftHzntl) <= 20) {
+                spaceship.translateLeftLowThrust = true;
+                spaceship.translateRightLowThrust = false;
+            } else {
+                spaceship.translateLeft = true; // <--
+                spaceship.translateRight = false;
+            }
         } else if (spaceship.velocity.x <= 0) {
             if (Math.abs(distLeftHzntl) <= stoppingDistanceHzntl && Math.abs(distLeftHzntl) > 0) {      
-                spaceship.translateLeft = false;
-                spaceship.translateRight = true;
+                if (Math.abs(distLeftHzntl) <= 20) {
+                    spaceship.translateLeftLowThrust = false;
+                    spaceship.translateRightLowThrust = true;
+                } else {
+                    spaceship.translateLeft = false; // -->
+                    spaceship.translateRight = true;
+                }
             } else if (Math.abs(distLeftHzntl) > stoppingDistanceHzntl) {
-                spaceship.translateLeft = true;
-                spaceship.translateRight = false;
+                if (Math.abs(distLeftHzntl) <= 20) {
+                    spaceship.translateLeftLowThrust = true;
+                    spaceship.translateRightLowThrust = false;
+                } else {
+                    spaceship.translateLeft = true; // <--
+                    spaceship.translateRight = false;
+                }
             }
         }
 
         if (Math.abs(distLeftHzntl) < 0+rndoff && Math.abs(distLeftHzntl) > 0-rndoff) {
             addStatText("Aligned towards target (1)", statsX, statsY+150);
-            spaceship.translateLeft = false;
-            spaceship.translateRight = false;
+                spaceship.translateLeftLowThrust = false;
+                spaceship.translateRightLowThrust = false;
+                spaceship.translateLeft = false; 
+                spaceship.translateRight = false;
         }
     }
 
@@ -678,10 +754,22 @@ function updateSpaceship()
         spaceship.velocity.y += (spaceship.thrust * Math.sin(spaceship.angle));
     }
 
+    if (spaceship.translateLeftLowThrust) {
+        fuel -= 0.01;
+        spaceship.velocity.x -= 0.3*(spaceship.thrust * Math.cos(-spaceship.angle));
+        spaceship.velocity.y += 0.3*(spaceship.thrust * Math.sin(spaceship.angle));
+    }
+
     if (spaceship.translateRight) {
         fuel -= 0.01;
         spaceship.velocity.x += (spaceship.thrust * Math.cos(-spaceship.angle));
         spaceship.velocity.y += (spaceship.thrust * Math.sin(spaceship.angle));
+    }
+
+    if (spaceship.translateRightLowThrust) {
+        fuel -= 0.01;
+        spaceship.velocity.x += 0.3*(spaceship.thrust * Math.cos(-spaceship.angle));
+        spaceship.velocity.y += 0.3*(spaceship.thrust * Math.sin(spaceship.angle));
     }
 
     if (spaceship.grounded == false) {
@@ -816,6 +904,8 @@ function autoPilotToggleManager() {
         spaceship.rotatingRight = false;
         spaceship.translateLeft = false;
         spaceship.translateRight = false;
+        spaceship.translateLeftLowThrust = false;
+        spaceship.translateRightLowThrust = false;
         autoPilotToggleButton.innerText = "AutoPilot (T): OFF";
     } else {
         spaceship.autoPilot = true;
