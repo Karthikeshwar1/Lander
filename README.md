@@ -4,6 +4,6 @@
 
 <br>
 
-<p>Well the above basically means 'Autonomous Spacecraft Maneuvering and Landing System' in an Indian language.</p>
+<p>Well the above basically means 'Autonomous Spacecraft Maneuvering and Landing System' in Kannada, an Indian language.</p>
 
 <br>
