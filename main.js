@@ -28,7 +28,7 @@ var landingRating = 0; // 0 - worst, 5 - best
 var leftTouched = false;
 var rightTouched = false;
 
-var rndoff = 3; // pixels
+var rndoff = 1; // pixels
 
 
 // Define oval properties
@@ -661,8 +661,11 @@ function updateSpaceship()
         }
     }
 
-    
-    
+    if (spaceship.velocity.y <= 0) {
+        spaceship.thurstDownwards = true;
+    } else {
+        spaceship.thurstDownwards = false;
+    }
 
     // if (spaceship.autoPilotlandOnTarget) {
 
