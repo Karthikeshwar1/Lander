@@ -1,5 +1,6 @@
 import { makeStateManager } from "./scripts/state.js";
-import { GRAVITY } from "./scripts/constants.js";
+import { EARTH, MOON, MARS, TITAN } from "./scripts/constants.js";
+
 
 var canvas = document.getElementById("mainScreen");
 var context = canvas.getContext("2d");
@@ -10,7 +11,7 @@ const canvasWidth = canvas.width;
 const canvasHeight = canvas.height;
 const groundLevel = canvasHeight - (canvasHeight * 0.07);
 var fuel = 100;
-var statsX = 900;
+var statsX = 950;
 var statsY = 50;
 
 const landingSurfaceOptions = document.querySelectorAll('input[name="landingSurface"]');
@@ -59,11 +60,19 @@ earthSurface.src = "./img/earthSurface.jpg"
 earthSurface.onload = function() {
     context.drawImage(earthSurface, 0, 0, canvasWidth, canvasHeight);
 };
+const titanSurface = new Image();
+titanSurface.src = "./img/titanSurface.jpg"
+titanSurface.onload = function() {
+    context.drawImage(titanSurface, 0, 0, canvasWidth, canvasHeight);
+};
 // LandingSurfaceImages = {
 //     Moon: "./img/moonsurface.jpeg",
 //     Mars: "./img/marsSurface.jpg"
 // }
+// STARTUP DEFAULTS
 var currentLandingSurface = marsSurface;
+var currPlanet = MARS
+var GRAVITY = currPlanet.gravity;
 
 // function drawImage() {
 //     var img = new Image();
@@ -105,7 +114,7 @@ var spaceship =
         x: 0,
         y: 0
     },
-    thrust: 0.01,
+    thrust: MARS.thrust,
     angle: 0,
     thrustUpwards: false,
     thrustUpwardsManual: false,
@@ -228,23 +237,89 @@ function drawBackground() {
     context.closePath();
 
     context.globalAlpha = 1;
+
+    // Draw heading
+    context.fillStyle = '#5b616b'; // NASA blue
+    context.strokeStyle = '#ffffff'; // White border
+    context.lineWidth = 2;
+    context.font = '18px Arial';
+    context.textAlign = 'center';
+    context.textBaseline = 'middle';
+
+    // Draw rounded rectangle
+    context.beginPath();
+    var x = canvasWidth/2 - 100;
+    var y = 20;
+    var width = 300;
+    var height = 35;
+    context.moveTo(x + 10, y);
+    context.lineTo(x + width - 10, y);
+    context.quadraticCurveTo(x + width, y, x + width, y + 10);
+    context.lineTo(x + width, y + height - 10);
+    context.quadraticCurveTo(x + width, y + height, x + width - 10, y + height);
+    context.lineTo(x + 10, y + height);
+    context.quadraticCurveTo(x, y + height, x, y + height - 10);
+    context.lineTo(x, y + 10);
+    context.quadraticCurveTo(x, y, x + 10, y);
+    context.closePath();
+    context.fill();
+    context.stroke();
+
+    // Draw text
+    context.fillStyle = '#ffffff'; // White text
+    context.fillText(String(currPlanet.name) + " (gravity: " + String(currPlanet.gravity_scientific) + " m/s^2)", x + width / 2, y + height / 2);
+
+    context.fillStyle = '#d6d7d9'; // NASA blue
+    context.strokeStyle = '#ffffff'; // White border
+    context.lineWidth = 2;
+    context.font = '18px Arial';
+    context.textAlign = 'center';
+    context.textBaseline = 'middle';
+
+    // Draw rounded rectangle
+    context.beginPath();
+    context.globalAlpha = 0.5;
+    var x = statsX-10;
+    var y = statsY-15;
+    var width = 220;
+    var height = 220;
+    context.moveTo(x + 10, y);
+    context.lineTo(x + width - 10, y);
+    context.quadraticCurveTo(x + width, y, x + width, y + 10);
+    context.lineTo(x + width, y + height - 10);
+    context.quadraticCurveTo(x + width, y + height, x + width - 10, y + height);
+    context.lineTo(x + 10, y + height);
+    context.quadraticCurveTo(x, y + height, x, y + height - 10);
+    context.lineTo(x, y + 10);
+    context.quadraticCurveTo(x, y, x + 10, y);
+    context.closePath();
+    context.fill();
+    context.stroke();
+
+    context.globalAlpha = 1.0;
 }
 
 function updateStats() {
-    context.font = "25px Arial";
-    context.fillStyle = "red";
+    context.textAlign = 'left';
+    context.font = "15px Arial";
+    context.fillStyle = "#5b616b";
     context.fillText("x: "+String((spaceship.position.x).toFixed(1))+" y: "+String((spaceship.position.y).toFixed(1)), statsX, statsY);
-    context.fillText("vx: "+String((spaceship.velocity.x).toFixed(3))+" vy: "+String((spaceship.velocity.y).toFixed(3)), statsX, statsY+30);
+    context.fillText("vx: "+String((spaceship.velocity.x).toFixed(3))+" vy: "+String((spaceship.velocity.y).toFixed(3)), statsX, statsY+15);
+    context.fillText("Gravity: "+String(GRAVITY), statsX, statsY+30);
+    context.fillText("Thrust: "+String(spaceship.thrust), statsX, statsY+45);
     context.fillText("Fuel: "+String(fuel.toFixed(2)), statsX, statsY+60);
-    context.fillText("Autopilot: "+String(spaceship.autoPilot), statsX, statsY+90);
+    context.fillText("Autopilot (T): "+String(spaceship.autoPilot), statsX, statsY+75);
  
     angleDividedBy2Pi =  ((spaceship.angle * (180 / Math.PI)) % 360);
-    context.fillText("CLM: "+String(changeLandingAreaMode), statsX, statsY+120);
+    context.fillText("CLM: "+String(changeLandingAreaMode), statsX, statsY+90);
+
+    
 }
 
 function addStatText(text, xpos, ypos) {
-    context.font = "25px Arial";
-    context.fillStyle = "red";
+    context.textAlign = 'left';
+    context.font = "15px Arial";
+    context.fillStyle = "#5b616b";
     context.fillText(text, xpos, ypos);
 }
 
@@ -412,7 +487,7 @@ function updateSpaceship()
    if (spaceship.autoPilot) {
     angleDividedBy2Pi =  ((spaceship.angle * (180 / Math.PI)) % 360);
 
-    addStatText("maxAccelerationHzntl"+String(maxAccelerationHzntl.toFixed(2)), statsX, statsY+150);
+    addStatText("maxAccelerationHzntl"+String(maxAccelerationHzntl.toFixed(2)), statsX, statsY+105);
 
     if (!autoPilotCalcDone) {
         doAutoPilotCalc();
@@ -425,10 +500,10 @@ function updateSpaceship()
     distLeftVtcl = targetLandingArea.position.y - (spaceship.position.y) - 100;
     direction = Math.sign(distLeftHzntl);
 
-    addStatText("distLeftHzntl: "+String(distLeftHzntl.toFixed(2)), statsX, statsY+240);
-    addStatText("stoppingDistanceHzntl: "+String(stoppingDistanceHzntl.toFixed(2)), statsX, statsY+270);
-    addStatText("distLeftVtcl: "+String(distLeftVtcl.toFixed(2)), statsX, statsY+300);
-    addStatText("stoppingDistanceVtcl: "+String(stoppingDistanceVtcl.toFixed(2)), statsX, statsY+330);
+    addStatText("distLeftHzntl: "+String(distLeftHzntl.toFixed(2)), statsX, statsY+120);
+    addStatText("stoppingDistanceHzntl: "+String(stoppingDistanceHzntl.toFixed(2)), statsX, statsY+135);
+    addStatText("distLeftVtcl: "+String(distLeftVtcl.toFixed(2)), statsX, statsY+180);
+    addStatText("stoppingDistanceVtcl: "+String(stoppingDistanceVtcl.toFixed(2)), statsX, statsY+195);
 
     if (distLeftVtcl <= stoppingDistanceVtcl && spaceship.velocity.y > targetLandingArea.safeLandingVerticalSpeed) {
         spaceship.thrustUpwards = true;
@@ -452,13 +527,13 @@ function updateSpaceship()
 
 
         if (Math.abs(distLeftHzntl) < 0+rndoff && Math.abs(distLeftHzntl) > 0-rndoff) {
-            addStatText("Aligned towards target", statsX, statsY+250);
+            addStatText("Aligned towards target", statsX, statsY+150);
             spaceship.translateLeft = false;
             spaceship.translateRight = false;
         }
     }
      else if (direction === -1) {
-        addStatText("Opposite direction", statsX, statsY+210);
+        addStatText("Opposite direction", statsX, statsY+165);
         if (spaceship.velocity.x > 0) {
             spaceship.translateLeft = true;
             spaceship.translateRight = false;
@@ -473,7 +548,7 @@ function updateSpaceship()
         }
 
         if (Math.abs(distLeftHzntl) < 0+rndoff && Math.abs(distLeftHzntl) > 0-rndoff) {
-            addStatText("Aligned towards target (1)", statsX, statsY+250);
+            addStatText("Aligned towards target (1)", statsX, statsY+150);
             spaceship.translateLeft = false;
             spaceship.translateRight = false;
         }
@@ -651,7 +726,7 @@ function keyReleased(event)
             // Up Arrow key
             spaceship.thrustUpwards = false;
             break;
-        case 72:
+        case 40:
         case 83: // Down Arrow key
             spaceship.thurstDownwards = false;
             break;
@@ -670,32 +745,32 @@ function keyPressed(event)
 {
     switch(event.keyCode)
     {
-        case 37:
+        case 37: // A
         case 65: // Left Arrow key
             spaceship.rotatingLeft = true;
             break;
-        case 39:
+        case 39: // D
         case 68: // Right Arrow key
             spaceship.rotatingRight = true;
             break;
-        case 38:
+        case 38: // W
         case 87: // Up Arrow key
             spaceship.thrustUpwards = true;
             break;
-        case 72:
+        case 40: // S
         case 83: // Down Arrow key
             spaceship.thurstDownwards = true;
             break;
-        case 81:
+        case 81: // Q
             spaceship.translateLeft = true;
             break;
-        case 69:
+        case 69: // E
             spaceship.translateRight = true;
             break;
-        case 84: // Autopilot toggle
+        case 84: // T - Autopilot toggle
             autoPilotToggleManager();
             break;
-        case 82: // Reset
+        case 82: // R - Reset
             resetSimulation();
             break;
     }
@@ -710,10 +785,10 @@ function autoPilotToggleManager() {
         spaceship.rotatingRight = false;
         spaceship.translateLeft = false;
         spaceship.translateRight = false;
-        autoPilotToggleButton.innerText = "AutoPilot: OFF";
+        autoPilotToggleButton.innerText = "AutoPilot (T): OFF";
     } else {
         spaceship.autoPilot = true;
-        autoPilotToggleButton.innerText = "AutoPilot: ON";
+        autoPilotToggleButton.innerText = "AutoPilot (T): ON";
     }
 }
 
@@ -726,6 +801,8 @@ function resetSimulation() {
     spaceship.velocity.y = 0;
     spaceship.angle = 0;
     fuel = 100;
+    GRAVITY = currPlanet.gravity;
+    spaceship.thrust = currPlanet.thrust;
 }
 
 document.addEventListener('keydown', keyPressed);
@@ -742,13 +819,21 @@ document.addEventListener('keydown', keyPressed);
     }
     if (landingSurfaceSelected === "Moon") {
         currentLandingSurface = moonSurface;
+        currPlanet = MOON;
     }
     else if (landingSurfaceSelected === "Mars") {
         currentLandingSurface = marsSurface;
+        currPlanet = MARS;
     } else if (landingSurfaceSelected === "Earth") {
-        currentLandingSurface = earthSurface; 
-    }else {
+        currentLandingSurface = earthSurface;
+        currPlanet = EARTH;
+    } else if (landingSurfaceSelected == "Titan") {
+        currentLandingSurface = titanSurface;
+        currPlanet = TITAN;
+    }
+    else {
         currentLandingSurface = marsSurface;
+        currPlanet = MARS;
     }
 
     const vehicleSelected = document.getElementById("vehicleSelect");

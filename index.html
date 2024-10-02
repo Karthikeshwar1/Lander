@@ -3,43 +3,108 @@
   <head>
     <title>Landing Module Simulator</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f0f0;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        border-radius: 5px;
+      }
+      #wholeScreen {
+        display: flex;
+        border: 2px solid #333;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.233);
+        background-color: #fff;
+        width: 1500px;
+        height: 720px;
+        border-radius: 5px;
+      }
+      .subScreen {
+        margin: 10px;
+      }
+      #sideScreen {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 20px;
+        background-color: #f9f9f9;
+      }
+      .infoText {
+        font-weight: bold;
+        font-size: 16px;
+      }
+      .btn {
+        background-color: #5b616b;
+        color: white;
+        padding: 7px 5px;
+        margin: 5px 0;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+        border-radius: 5px;
+      }
+      .btn:hover {
+        background-color: #323a45;
+      }
+      .dropdown select {
+        padding: 5px;
+        font-size: 16px;
+        border-radius: 5px;
+      }
+      .box {
+        border: 1px solid #ccc;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+      }
+      .controlsInfo {
+        margin-top: 20px;
+        font-size: 14px;
+        color: #555;
+      }
+    </style>
   </head>
   <body>
     <div id="wholeScreen">
       <canvas id="mainScreen" class="subScreen" width="1200" height="700"></canvas>
-      <div id="sideScreen" class="subScreen" width="200" height="500">
-        <form>
-          <p>Select landing surface:</p>
-          <input type="radio" id="moon" name="landingSurface" value="Moon">
-          <label for="moon">Moon</label><br>
-          <input type="radio" id="earth" name="landingSurface" value="Earth">
-          <label for="earth">Earth</label><br>
-          <input type="radio" id="mars" name="landingSurface" value="Mars">
-          <label for="mars">Mars</label>
-        </form>
-        <br>
-        <br>
-        <div class="dropdown" id="dropdownOptionForVehicle">
-          <select id="vehicleSelect">
-            <option value="Aries">Aries</option>
-            <option value="SpaceX">SpaceX</option>
-          </select>
+      <div id="sideScreen" class="subScreen">
+        <div class="box">
+          <form>
+            <p class="infoText">Landing surface:</p>
+            <input type="radio" id="earth" name="landingSurface" value="Earth">
+            <label for="earth">Earth</label><br>
+            <input type="radio" id="moon" name="landingSurface" value="Moon">
+            <label for="moon">Moon</label><br>
+            <input type="radio" id="mars" name="landingSurface" value="Mars">
+            <label for="mars">Mars</label><br>
+            <input type="radio" id="titan" name="landingSurface" value="Titan">
+            <label for="titan">Titan</label><br>
+          </form>
+          <div class="dropdown" id="dropdownOptionForVehicle">
+            <p class="infoText">Vehicle:</p>
+            <select id="vehicleSelect">
+              <option value="Aries">Aries</option>
+              <option value="SpaceX">SpaceX</option>
+            </select>
+          </div>
+          <br>
+          <button class="btn" id="confirmSettingsButton">Confirm settings</button>
         </div>
-        <br>
-        <br>
-        <button class="btn" id="confirmSettingsButton">Confirm settings</button>
-        <br>
-        <br>
-        <br>
-        <button id="autoPilotToggle">AutoPilot (T): ON</button>
-        <br>
-        <br>
-        <button id="changeLandingArea">Change Landing Area</button>
-        <br>  
-        <br>
-        <button id="resetSimulation">Reset (R)</button>
-        <br>
-        <br>
+        <div class="box">
+          <button class="btn" id="autoPilotToggle">AutoPilot (T): ON</button>
+          <button class="btn" id="changeLandingArea">Change Landing Area</button>
+          <button class="btn" id="resetSimulation">Reset (R)</button>
+        </div>
+        <div class="controlsInfo">
+          <p>Controls:</p>
+          <p>W, A, S, D - Move</p>
+          <p>Q, E - Translate</p>
+        </div>
       </div>
     </div>
     <script type="module" src="main.js"></script>
